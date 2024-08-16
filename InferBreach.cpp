@@ -1,4 +1,4 @@
-#include "BreachType.h"
+#include "InferBreach.h"
 
 BreachType inferBreach(double value, double lowerLimit, double upperLimit) {
   if(value < lowerLimit) {
