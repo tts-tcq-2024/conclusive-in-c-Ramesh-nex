@@ -1,12 +1,11 @@
 #include "typewise-alert.h"
 #include <stdio.h>
 
-const double PASSIVE_COOLING_LOWER_LIMIT = 0.0;
-const double PASSIVE_COOLING_UPPER_LIMIT = 35.0;
-const double HI_ACTIVE_COOLING_LOWER_LIMIT = 0.0;
-const double HI_ACTIVE_COOLING_UPPER_LIMIT = 45.0;
-const double MED_ACTIVE_COOLING_LOWER_LIMIT = 0.0;
-const double MED_ACTIVE_COOLING_UPPER_LIMIT = 40.0;
+const double COOLING_LIMITS[][2] = {
+    {0.0, 35.0},  // PASSIVE_COOLING
+    {0.0, 45.0},  // HI_ACTIVE_COOLING
+    {0.0, 40.0}   // MED_ACTIVE_COOLING
+};
 
 BreachType inferBreach(double value, double lowerLimit, double upperLimit) {
   if(value < lowerLimit) {
@@ -18,24 +17,14 @@ BreachType inferBreach(double value, double lowerLimit, double upperLimit) {
   return NORMAL;
 }
 
+// Function to get temperature limits based on cooling type
 void getTemperatureLimits(CoolingType coolingType, double* lowerLimit, double* upperLimit) {
-  switch (coolingType) {
-    case PASSIVE_COOLING:
-      *lowerLimit = PASSIVE_COOLING_LOWER_LIMIT;
-      *upperLimit = PASSIVE_COOLING_UPPER_LIMIT;
-      break;
-    case HI_ACTIVE_COOLING:
-      *lowerLimit = HI_ACTIVE_COOLING_LOWER_LIMIT;
-      *upperLimit = HI_ACTIVE_COOLING_UPPER_LIMIT;
-      break;
-    case MED_ACTIVE_COOLING:
-      *lowerLimit = MED_ACTIVE_COOLING_LOWER_LIMIT;
-      *upperLimit = MED_ACTIVE_COOLING_UPPER_LIMIT;
-      break;
-    default:
-      *lowerLimit = 0;
-      *upperLimit = 0;
-      break;
+  if (coolingType >= PASSIVE_COOLING && coolingType <= MED_ACTIVE_COOLING) {
+    *lowerLimit = COOLING_LIMITS[coolingType][0];
+    *upperLimit = COOLING_LIMITS[coolingType][1];
+  } else {
+    *lowerLimit = 0;
+    *upperLimit = 0;
   }
 }
 
