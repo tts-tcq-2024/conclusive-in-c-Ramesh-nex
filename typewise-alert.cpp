@@ -43,18 +43,23 @@ void sendToController(BreachType breachType) {
 // Function to simulate sending an alert via email
 void sendToEmail(BreachType breachType) {
   const char* recipient = "a.b@c.com";
+
+  // Prepare the message based on the breach type
+  const char* message = "";
   switch (breachType) {
     case TOO_LOW:
-      printf("To: %s\n", recipient);
-      printf("Hi, the temperature is too low\n");
+      message = "Hi, the temperature is too low\n";
       break;
     case TOO_HIGH:
-      printf("To: %s\n", recipient);
-      printf("Hi, the temperature is too high\n");
+      message = "Hi, the temperature is too high\n";
       break;
     case NORMAL:
-      break;
+      return; // No message to send
   }
+
+  // Print the message if it's not empty
+  printf("To: %s\n", recipient);
+  printf("%s", message);
 }
 
 // Function to check temperature and send appropriate alert
