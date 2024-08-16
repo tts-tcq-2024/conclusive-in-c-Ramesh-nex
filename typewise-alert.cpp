@@ -41,7 +41,7 @@ void getTemperatureLimits(CoolingType coolingType, double* lowerLimit, double* u
 
 BreachType classifyTemperatureBreach(CoolingType coolingType, double temperatureInC) {
   double lowerLimit, upperLimit;
-  getTemperatureLimits(coolingType, lowerLimit, upperLimit);
+  getTemperatureLimits(coolingType, &lowerLimit, &upperLimit);
   return inferBreach(temperatureInC, lowerLimit, upperLimit);
 }
 
