@@ -7,16 +7,6 @@ const double COOLING_LIMITS[][2] = {
     {0.0, 40.0}   // MED_ACTIVE_COOLING
 };
 
-BreachType inferBreach(double value, double lowerLimit, double upperLimit) {
-  if(value < lowerLimit) {
-    return TOO_LOW;
-  }
-  if(value > upperLimit) {
-    return TOO_HIGH;
-  }
-  return NORMAL;
-}
-
 // Function to get temperature limits based on cooling type
 void getTemperatureLimits(CoolingType coolingType, double* lowerLimit, double* upperLimit) {
   if (coolingType >= PASSIVE_COOLING && coolingType <= MED_ACTIVE_COOLING) {
