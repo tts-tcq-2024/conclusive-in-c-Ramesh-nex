@@ -1,4 +1,4 @@
-#include "BreachType.h"
+#include "SendtoEmail.h"
 
 void sendToEmail(BreachType breachType)
 {
