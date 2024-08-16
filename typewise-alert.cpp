@@ -45,40 +45,37 @@ BreachType classifyTemperatureBreach(CoolingType coolingType, double temperature
   return inferBreach(temperatureInC, lowerLimit, upperLimit);
 }
 
-void checkAndAlert(
-    AlertTarget alertTarget, BatteryCharacter batteryChar, double temperatureInC) {
-
-  BreachType breachType = classifyTemperatureBreach(
-    batteryChar.coolingType, temperatureInC
-  );
-
-  switch(alertTarget) {
-    case TO_CONTROLLER:
-      sendToController(breachType);
-      break;
-    case TO_EMAIL:
-      sendToEmail(breachType);
-      break;
-  }
-}
-
+// Function to simulate sending an alert to the controller
 void sendToController(BreachType breachType) {
   const unsigned short header = 0xfeed;
   printf("%x : %x\n", header, breachType);
 }
 
+// Function to simulate sending an alert via email
 void sendToEmail(BreachType breachType) {
-  const char* recepient = "a.b@c.com";
-  switch(breachType) {
+  const char* recipient = "a.b@c.com";
+  switch (breachType) {
     case TOO_LOW:
-      printf("To: %s\n", recepient);
+      printf("To: %s\n", recipient);
       printf("Hi, the temperature is too low\n");
       break;
     case TOO_HIGH:
-      printf("To: %s\n", recepient);
+      printf("To: %s\n", recipient);
       printf("Hi, the temperature is too high\n");
       break;
     case NORMAL:
       break;
+  }
+}
+
+// Function to check temperature and send appropriate alert
+void checkAndAlert(AlertTarget alertTarget, BatteryCharacter batteryChar, double temperatureInC) {
+  BreachType breachType = classifyTemperatureBreach(batteryChar.coolingType, temperatureInC);
+  
+  // Choose the appropriate alert function based on alertTarget
+  if (alertTarget == TO_CONTROLLER) {
+    sendToController(breachType);
+  } else if (alertTarget == TO_EMAIL) {
+    sendToEmail(breachType);
   }
 }
