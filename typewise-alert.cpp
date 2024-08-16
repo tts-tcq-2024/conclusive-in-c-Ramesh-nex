@@ -1,6 +1,13 @@
 #include "typewise-alert.h"
 #include <stdio.h>
 
+const double PASSIVE_COOLING_LOWER_LIMIT = 0.0;
+const double PASSIVE_COOLING_UPPER_LIMIT = 35.0;
+const double HI_ACTIVE_COOLING_LOWER_LIMIT = 0.0;
+const double HI_ACTIVE_COOLING_UPPER_LIMIT = 45.0;
+const double MED_ACTIVE_COOLING_LOWER_LIMIT = 0.0;
+const double MED_ACTIVE_COOLING_UPPER_LIMIT = 40.0;
+
 BreachType inferBreach(double value, double lowerLimit, double upperLimit) {
   if(value < lowerLimit) {
     return TOO_LOW;
