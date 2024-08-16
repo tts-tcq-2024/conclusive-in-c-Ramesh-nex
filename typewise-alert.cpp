@@ -53,11 +53,6 @@ void sendToEmail(BreachType breachType) {
   }
 }
 
-  // Print the message if it's not empty
-  printf("To: %s\n", recipient);
-  printf("%s", message);
-}
-
 // Function to check temperature and send appropriate alert
 void checkAndAlert(AlertTarget alertTarget, BatteryCharacter batteryChar, double temperatureInC) {
   BreachType breachType = classifyTemperatureBreach(batteryChar.coolingType, temperatureInC);
