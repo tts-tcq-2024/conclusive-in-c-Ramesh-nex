@@ -34,13 +34,6 @@ BreachType classifyTemperatureBreach(CoolingType coolingType, double temperature
   return inferBreach(temperatureInC, lowerLimit, upperLimit);
 }
 
-// Function to simulate sending an alert to the controller
-void sendToController(BreachType breachType) {
-  const unsigned short header = 0xfeed;
-  printf("%x : %x\n", header, breachType);
-}
-
-
 // Function to check temperature and send appropriate alert
 void checkAndAlert(AlertTarget alertTarget, BatteryCharacter batteryChar, double temperatureInC) {
   BreachType breachType = classifyTemperatureBreach(batteryChar.coolingType, temperatureInC);
