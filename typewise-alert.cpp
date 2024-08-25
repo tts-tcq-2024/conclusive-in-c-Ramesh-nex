@@ -8,9 +8,6 @@ const double COOLING_LIMITS[][2] =
     {0.0, 40.0}   // MED_ACTIVE_COOLING
 };
 
-SendToControllerFunc sendToControllerFunc = defaultSendToController;
-SendToEmailFunc sendToEmailFunc = defaultSendToEmail;
-
 BreachType inferBreach(double value, double lowerLimit, double upperLimit)
 {
     if(value < lowerLimit)
@@ -50,11 +47,11 @@ void checkAndAlert(AlertTarget alertTarget, BatteryCharacter batteryChar, double
     BreachType breachType = classifyTemperatureBreach(batteryChar.coolingType, temperatureInC);
     if (alertTarget == TO_CONTROLLER)
     {
-        sendToControllerFunc(breachType);
+        sendToController(breachType);
     }
     else if (alertTarget == TO_EMAIL) 
     {
-        sendToEmailFunc(breachType);
+        sendToEmail(breachType);
     }
 }
 
