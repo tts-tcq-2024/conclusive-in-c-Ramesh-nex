@@ -1,4 +1,5 @@
 #pragma once
+#include <functional> // Include this for std::function
 
 typedef enum {
   PASSIVE_COOLING,
