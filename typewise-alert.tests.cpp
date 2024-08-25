@@ -2,6 +2,7 @@
 #include "typewise-alert.h"
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
+#define MOCK_FUNCTIONS
 
 void sendToController(BreachType breachType) {
     // Mocked implementation for testing purposes
