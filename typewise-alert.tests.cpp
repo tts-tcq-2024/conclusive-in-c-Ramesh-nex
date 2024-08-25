@@ -1,8 +1,6 @@
 #include <gtest/gtest.h>
 #include "typewise-alert.h"
-#include <gtest/gtest.h>
-#include <gmock/gmock.h>
-#define MOCK_FUNCTIONS
+#include "alert-functions.h" 
 
 // Test Case for inferBreach
 TEST(TemperatureTest, InferBreach)
@@ -34,7 +32,7 @@ TEST(TemperatureTest, GetTemperatureLimits)
     EXPECT_DOUBLE_EQ(upperLimit, 0.0);
 }
 
-
+// Test Case for classifyTemperatureBreach
 TEST(TemperatureTest, ClassifyTemperatureBreach)
 {
     EXPECT_EQ(classifyTemperatureBreach(PASSIVE_COOLING, 20.0), NORMAL);
@@ -47,8 +45,4 @@ TEST(TemperatureTest, ClassifyTemperatureBreach)
     EXPECT_EQ(classifyTemperatureBreach(MED_ACTIVE_COOLING, 20.0), NORMAL);
     EXPECT_EQ(classifyTemperatureBreach(MED_ACTIVE_COOLING, 45.0), TOO_HIGH);
 }
-
-
-
-
 
