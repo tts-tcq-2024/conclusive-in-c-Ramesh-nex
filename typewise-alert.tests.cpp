@@ -2,22 +2,25 @@
 #include <gmock/gmock.h>
 #include "typewise-alert.h"
 
-// Mocking the global functions
+// Mock class to replace the functions
 class MockAlert {
 public:
     MOCK_METHOD(void, sendToController, (BreachType), ());
     MOCK_METHOD(void, sendToEmail, (BreachType), ());
 };
 
+// Instantiate the mock object
 MockAlert mockAlert;
 
-// These functions will call the mock functions
-void sendToController(BreachType breachType) {
-    mockAlert.sendToController(breachType);
-}
+// Mock implementations for the test file
+extern "C" {
+    void sendToController(BreachType breachType) {
+        mockAlert.sendToController(breachType);
+    }
 
-void sendToEmail(BreachType breachType) {
-    mockAlert.sendToEmail(breachType);
+    void sendToEmail(BreachType breachType) {
+        mockAlert.sendToEmail(breachType);
+    }
 }
 
 // Test Case for inferBreach
@@ -64,10 +67,8 @@ TEST(TemperatureTest, ClassifyTemperatureBreach) {
 // Test Case for checkAndAlert
 TEST(TemperatureTest, CheckAndAlert) {
     {
-        // Ensure that the calls are made in a specific sequence
         ::testing::InSequence seq;
 
-        // Expectations for mock functions
         EXPECT_CALL(mockAlert, sendToController(TOO_LOW))
             .Times(1);
         EXPECT_CALL(mockAlert, sendToEmail(TOO_HIGH))
