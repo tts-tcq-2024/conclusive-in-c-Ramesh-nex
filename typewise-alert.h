@@ -28,4 +28,7 @@ typedef struct {
 void checkAndAlert(
   AlertTarget alertTarget, BatteryCharacter batteryChar, double temperatureInC);
 
+extern void sendToController(BreachType breachType);
+extern void sendToEmail(BreachType breachType);
+
 
