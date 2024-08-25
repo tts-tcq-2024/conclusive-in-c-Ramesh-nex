@@ -1,5 +1,4 @@
 #include "typewise-alert.h"
-#include "alert-functions.h"
 #include <stdio.h>
 
 const double COOLING_LIMITS[][2] = 
@@ -9,10 +8,19 @@ const double COOLING_LIMITS[][2] =
     {0.0, 40.0}   // MED_ACTIVE_COOLING
 };
 
+SendToControllerFunc sendToControllerFunc = defaultSendToController;
+SendToEmailFunc sendToEmailFunc = defaultSendToEmail;
+
 BreachType inferBreach(double value, double lowerLimit, double upperLimit)
 {
-    if (value < lowerLimit) return TOO_LOW;
-    if (value > upperLimit) return TOO_HIGH;
+    if(value < lowerLimit)
+    {
+        return TOO_LOW;
+    }
+    if(value > upperLimit)
+    {
+        return TOO_HIGH;
+    }
     return NORMAL;
 }
 
@@ -42,10 +50,25 @@ void checkAndAlert(AlertTarget alertTarget, BatteryCharacter batteryChar, double
     BreachType breachType = classifyTemperatureBreach(batteryChar.coolingType, temperatureInC);
     if (alertTarget == TO_CONTROLLER)
     {
-        sendToController(breachType);
+        sendToControllerFunc(breachType);
     }
     else if (alertTarget == TO_EMAIL) 
     {
-        sendToEmail(breachType);
+        sendToEmailFunc(breachType);
+    }
+}
+
+void defaultSendToEmail(BreachType breachType)
+{
+    const char* recipient = "a.b@c.com";
+    if (breachType == TOO_LOW) 
+    {
+        printf("To: %s\n", recipient);
+        printf("Hi, the temperature is too low\n");
+    }
+    else if (breachType == TOO_HIGH) 
+    {
+        printf("To: %s\n", recipient);
+        printf("Hi, the temperature is too high\n");
     }
 }
