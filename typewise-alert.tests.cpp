@@ -3,6 +3,14 @@
 #include "typewise-alert.h"
 #include "alert-functions.h"
 
+// Mocking the functions
+class MockAlertFunctions {
+public:
+    MOCK_METHOD(void, sendToController, (BreachType), ());
+    MOCK_METHOD(void, sendToEmail, (BreachType), ());
+};
+
+MockAlertFunctions mockFunctions;
 
 // Test Case for inferBreach
 TEST(TemperatureTest, InferBreach) {
@@ -45,4 +53,18 @@ TEST(TemperatureTest, ClassifyTemperatureBreach) {
     EXPECT_EQ(classifyTemperatureBreach(MED_ACTIVE_COOLING, 45.0), TOO_HIGH);
 }
 
+// Test Case for checkAndAlert with Mock
+TEST(TemperatureTest, CheckAndAlert) {
+    // Define the mock function behavior
+    EXPECT_CALL(mockFunctions, sendToController(TOO_LOW)).Times(1);
+    EXPECT_CALL(mockFunctions, sendToEmail(TOO_HIGH)).Times(1);
 
+    // Pass mock functions as parameters
+    checkAndAlert(TO_CONTROLLER, {PASSIVE_COOLING}, -10.0, 
+                  [](BreachType bt){ mockFunctions.sendToController(bt); }, 
+                  [](BreachType bt){ mockFunctions.sendToEmail(bt); });
+
+    checkAndAlert(TO_EMAIL, {HI_ACTIVE_COOLING}, 50.0, 
+                  [](BreachType bt){ mockFunctions.sendToController(bt); }, 
+                  [](BreachType bt){ mockFunctions.sendToEmail(bt); });
+}
