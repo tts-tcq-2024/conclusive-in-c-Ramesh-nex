@@ -1,4 +1,5 @@
 #include "typewise-alert.h"
+#include "alert-functions.h"
 #include <stdio.h>
 
 const double COOLING_LIMITS[][2] = 
@@ -34,4 +35,17 @@ BreachType classifyTemperatureBreach(CoolingType coolingType, double temperature
     double lowerLimit, upperLimit;
     getTemperatureLimits(coolingType, &lowerLimit, &upperLimit);
     return inferBreach(temperatureInC, lowerLimit, upperLimit);
+}
+
+void checkAndAlert(AlertTarget alertTarget, BatteryCharacter batteryChar, double temperatureInC)
+{
+    BreachType breachType = classifyTemperatureBreach(batteryChar.coolingType, temperatureInC);
+    if (alertTarget == TO_CONTROLLER)
+    {
+        sendToController(breachType);
+    }
+    else if (alertTarget == TO_EMAIL) 
+    {
+        sendToEmail(breachType);
+    }
 }
