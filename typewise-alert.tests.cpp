@@ -2,130 +2,85 @@
 #include <gmock/gmock.h>
 #include "typewise-alert.h"
 
-using namespace testing;
-
-// Mock class to replace the alert functions
+// Mock class to replace the functions
 class MockAlert {
 public:
     MOCK_METHOD(void, sendToController, (BreachType), ());
     MOCK_METHOD(void, sendToEmail, (BreachType), ());
 };
 
-// Create a global mock object
+// Instantiate the mock object
 MockAlert mockAlert;
 
-// Set the function pointers to use the mock implementations
-SendToControllerFunc sendToControllerFunc = [](BreachType breachType) {
-    mockAlert.sendToController(breachType);
-};
-SendToEmailFunc sendToEmailFunc = [](BreachType breachType) {
-    mockAlert.sendToEmail(breachType);
-};
+// Mock implementations for the test file
+extern "C" {
+    void sendToController(BreachType breachType) {
+        mockAlert.sendToController(breachType);
+    }
 
-// Test for normal temperature in passive cooling
-TEST(TemperatureTest, NormalTemperatureInPassiveCooling) {
-    EXPECT_CALL(mockAlert, sendToController(NORMAL)).Times(0);
-    EXPECT_CALL(mockAlert, sendToEmail(NORMAL)).Times(0);
-
-    BatteryCharacter batteryChar;
-    batteryChar.coolingType = PASSIVE_COOLING;
-
-    checkAndAlert(TO_CONTROLLER, batteryChar, 25.0); // Should not trigger any alert
-    checkAndAlert(TO_EMAIL, batteryChar, 25.0);     // Should not trigger any alert
+    void sendToEmail(BreachType breachType) {
+        mockAlert.sendToEmail(breachType);
+    }
 }
 
-// Test for too high temperature in passive cooling
-TEST(TemperatureTest, TooHighTemperatureInPassiveCooling) {
-    EXPECT_CALL(mockAlert, sendToController(TOO_HIGH)).Times(1);
-    EXPECT_CALL(mockAlert, sendToEmail(TOO_HIGH)).Times(0);
-
-    BatteryCharacter batteryChar;
-    batteryChar.coolingType = PASSIVE_COOLING;
-
-    checkAndAlert(TO_CONTROLLER, batteryChar, 36.0); // Triggers sendToController
-    checkAndAlert(TO_EMAIL, batteryChar, 36.0);     // No email alert
+// Test Case for inferBreach
+TEST(TemperatureTest, InferBreach) {
+    EXPECT_EQ(inferBreach(20.0, 0.0, 35.0), NORMAL);
+    EXPECT_EQ(inferBreach(-5.0, 0.0, 35.0), TOO_LOW);
+    EXPECT_EQ(inferBreach(40.0, 0.0, 35.0), TOO_HIGH);
 }
 
-// Test for too low temperature in passive cooling
-TEST(TemperatureTest, TooLowTemperatureInPassiveCooling) {
-    EXPECT_CALL(mockAlert, sendToController(TOO_LOW)).Times(1);
-    EXPECT_CALL(mockAlert, sendToEmail(TOO_LOW)).Times(0);
+// Test Case for getTemperatureLimits
+TEST(TemperatureTest, GetTemperatureLimits) {
+    double lowerLimit, upperLimit;
 
-    BatteryCharacter batteryChar;
-    batteryChar.coolingType = PASSIVE_COOLING;
+    getTemperatureLimits(PASSIVE_COOLING, &lowerLimit, &upperLimit);
+    EXPECT_DOUBLE_EQ(lowerLimit, 0.0);
+    EXPECT_DOUBLE_EQ(upperLimit, 35.0);
 
-    checkAndAlert(TO_CONTROLLER, batteryChar, -1.0); // Triggers sendToController
-    checkAndAlert(TO_EMAIL, batteryChar, -1.0);     // No email alert
+    getTemperatureLimits(HI_ACTIVE_COOLING, &lowerLimit, &upperLimit);
+    EXPECT_DOUBLE_EQ(lowerLimit, 0.0);
+    EXPECT_DOUBLE_EQ(upperLimit, 45.0);
+
+    getTemperatureLimits(MED_ACTIVE_COOLING, &lowerLimit, &upperLimit);
+    EXPECT_DOUBLE_EQ(lowerLimit, 0.0);
+    EXPECT_DOUBLE_EQ(upperLimit, 40.0);
+
+    getTemperatureLimits(static_cast<CoolingType>(999), &lowerLimit, &upperLimit);
+    EXPECT_DOUBLE_EQ(lowerLimit, 0.0);
+    EXPECT_DOUBLE_EQ(upperLimit, 0.0);
 }
 
-// Test for normal temperature in hi-active cooling
-TEST(TemperatureTest, NormalTemperatureInHiActiveCooling) {
-    EXPECT_CALL(mockAlert, sendToController(NORMAL)).Times(0);
-    EXPECT_CALL(mockAlert, sendToEmail(NORMAL)).Times(0);
+// Test Case for classifyTemperatureBreach
+TEST(TemperatureTest, ClassifyTemperatureBreach) {
+    EXPECT_EQ(classifyTemperatureBreach(PASSIVE_COOLING, 20.0), NORMAL);
+    EXPECT_EQ(classifyTemperatureBreach(PASSIVE_COOLING, -5.0), TOO_LOW);
+    EXPECT_EQ(classifyTemperatureBreach(PASSIVE_COOLING, 40.0), TOO_HIGH);
 
-    BatteryCharacter batteryChar;
-    batteryChar.coolingType = HI_ACTIVE_COOLING;
+    EXPECT_EQ(classifyTemperatureBreach(HI_ACTIVE_COOLING, 30.0), NORMAL);
+    EXPECT_EQ(classifyTemperatureBreach(HI_ACTIVE_COOLING, 50.0), TOO_HIGH);
 
-    checkAndAlert(TO_CONTROLLER, batteryChar, 30.0); // Should not trigger any alert
-    checkAndAlert(TO_EMAIL, batteryChar, 30.0);     // Should not trigger any alert
+    EXPECT_EQ(classifyTemperatureBreach(MED_ACTIVE_COOLING, 20.0), NORMAL);
+    EXPECT_EQ(classifyTemperatureBreach(MED_ACTIVE_COOLING, 45.0), TOO_HIGH);
 }
 
-// Test for too high temperature in hi-active cooling
-TEST(TemperatureTest, TooHighTemperatureInHiActiveCooling) {
-    EXPECT_CALL(mockAlert, sendToController(TOO_HIGH)).Times(1);
-    EXPECT_CALL(mockAlert, sendToEmail(TOO_HIGH)).Times(0);
+// Test Case for checkAndAlert
+TEST(TemperatureTest, CheckAndAlert) {
+    {
+        ::testing::InSequence seq;
 
-    BatteryCharacter batteryChar;
-    batteryChar.coolingType = HI_ACTIVE_COOLING;
+        EXPECT_CALL(mockAlert, sendToController(TOO_LOW))
+            .Times(1);
+        EXPECT_CALL(mockAlert, sendToEmail(TOO_HIGH))
+            .Times(1);
 
-    checkAndAlert(TO_CONTROLLER, batteryChar, 46.0); // Triggers sendToController
-    checkAndAlert(TO_EMAIL, batteryChar, 46.0);     // No email alert
-}
+        BatteryCharacter batteryChar;
+        batteryChar.coolingType = PASSIVE_COOLING;
 
-// Test for too low temperature in hi-active cooling
-TEST(TemperatureTest, TooLowTemperatureInHiActiveCooling) {
-    EXPECT_CALL(mockAlert, sendToController(TOO_LOW)).Times(1);
-    EXPECT_CALL(mockAlert, sendToEmail(TOO_LOW)).Times(0);
+        // Testing sendToController call
+        checkAndAlert(TO_CONTROLLER, batteryChar, -5.0); // Triggers sendToController
 
-    BatteryCharacter batteryChar;
-    batteryChar.coolingType = HI_ACTIVE_COOLING;
-
-    checkAndAlert(TO_CONTROLLER, batteryChar, -1.0); // Triggers sendToController
-    checkAndAlert(TO_EMAIL, batteryChar, -1.0);     // No email alert
-}
-
-// Test for normal temperature in med-active cooling
-TEST(TemperatureTest, NormalTemperatureInMedActiveCooling) {
-    EXPECT_CALL(mockAlert, sendToController(NORMAL)).Times(0);
-    EXPECT_CALL(mockAlert, sendToEmail(NORMAL)).Times(0);
-
-    BatteryCharacter batteryChar;
-    batteryChar.coolingType = MED_ACTIVE_COOLING;
-
-    checkAndAlert(TO_CONTROLLER, batteryChar, 35.0); // Should not trigger any alert
-    checkAndAlert(TO_EMAIL, batteryChar, 35.0);     // Should not trigger any alert
-}
-
-// Test for too high temperature in med-active cooling
-TEST(TemperatureTest, TooHighTemperatureInMedActiveCooling) {
-    EXPECT_CALL(mockAlert, sendToController(TOO_HIGH)).Times(1);
-    EXPECT_CALL(mockAlert, sendToEmail(TOO_HIGH)).Times(0);
-
-    BatteryCharacter batteryChar;
-    batteryChar.coolingType = MED_ACTIVE_COOLING;
-
-    checkAndAlert(TO_CONTROLLER, batteryChar, 41.0); // Triggers sendToController
-    checkAndAlert(TO_EMAIL, batteryChar, 41.0);     // No email alert
-}
-
-// Test for too low temperature in med-active cooling
-TEST(TemperatureTest, TooLowTemperatureInMedActiveCooling) {
-    EXPECT_CALL(mockAlert, sendToController(TOO_LOW)).Times(1);
-    EXPECT_CALL(mockAlert, sendToEmail(TOO_LOW)).Times(0);
-
-    BatteryCharacter batteryChar;
-    batteryChar.coolingType = MED_ACTIVE_COOLING;
-
-    checkAndAlert(TO_CONTROLLER, batteryChar, -1.0); // Triggers sendToController
-    checkAndAlert(TO_EMAIL, batteryChar, -1.0);     // No email alert
+        // Testing sendToEmail call
+        checkAndAlert(TO_EMAIL, batteryChar, 40.0); // Triggers sendToEmail
+    }
 }
