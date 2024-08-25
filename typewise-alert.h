@@ -1,4 +1,5 @@
 #pragma once
+#include <functional> // Include this for std::function
 
 typedef enum {
   PASSIVE_COOLING,
@@ -12,9 +13,6 @@ typedef enum {
   TOO_HIGH
 } BreachType;
 
-BreachType inferBreach(double value, double lowerLimit, double upperLimit);
-BreachType classifyTemperatureBreach(CoolingType coolingType, double temperatureInC);
-
 typedef enum {
   TO_CONTROLLER,
   TO_EMAIL
@@ -25,8 +23,11 @@ typedef struct {
   char brand[48];
 } BatteryCharacter;
 
-void checkAndAlert(
-  AlertTarget alertTarget, BatteryCharacter batteryChar, double temperatureInC);
 
-void sendToController(BreachType breachType);
-void sendToEmail(BreachType breachType);
+BreachType inferBreach(double value, double lowerLimit, double upperLimit);
+BreachType classifyTemperatureBreach(CoolingType coolingType, double temperatureInC);
+void getTemperatureLimits(CoolingType coolingType, double* lowerLimit, double* upperLimit);
+
+void checkAndAlert(AlertTarget alertTarget, BatteryCharacter batteryChar, double temperatureInC,
+                    std::function<void(BreachType)> sendController,
+                    std::function<void(BreachType)> sendEmail);
