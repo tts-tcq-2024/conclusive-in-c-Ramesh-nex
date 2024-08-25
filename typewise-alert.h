@@ -26,6 +26,7 @@ typedef struct {
 BreachType inferBreach(double value, double lowerLimit, double upperLimit);
 BreachType classifyTemperatureBreach(CoolingType coolingType, double temperatureInC);
 void getTemperatureLimits(CoolingType coolingType, double* lowerLimit, double* upperLimit);
-//void checkAndAlert(AlertTarget alertTarget, BatteryCharacter batteryChar, double temperatureInC);
+
 void checkAndAlert(AlertTarget alertTarget, BatteryCharacter batteryChar, double temperatureInC,
-                    void (*sendController)(BreachType), void (*sendEmail)(BreachType));
+                    std::function<void(BreachType)> sendController,
+                    std::function<void(BreachType)> sendEmail);
