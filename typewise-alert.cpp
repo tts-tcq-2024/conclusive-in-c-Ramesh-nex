@@ -1,4 +1,5 @@
 #include "typewise-alert.h"
+#include "alert-functions.h"
 #include <stdio.h>
 
 const double COOLING_LIMITS[][2] = 
