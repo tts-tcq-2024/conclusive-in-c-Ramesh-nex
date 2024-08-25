@@ -1,1 +1,1 @@
-
+void sendToController(BreachType breachType);
