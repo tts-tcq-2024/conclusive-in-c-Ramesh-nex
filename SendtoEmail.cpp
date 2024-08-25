@@ -1,3 +1,4 @@
+#include "SendtoEmail.h"
 void sendToEmail(BreachType breachType)
 {
   const char* recipient = "a.b@c.com";
