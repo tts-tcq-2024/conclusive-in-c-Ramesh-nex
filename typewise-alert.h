@@ -22,11 +22,6 @@ typedef struct {
   char brand[48];
 } BatteryCharacter;
 
-typedef void (*SendToControllerFunc)(BreachType breachType);
-typedef void (*SendToEmailFunc)(BreachType breachType);
-
-extern SendToControllerFunc sendToControllerFunc;
-extern SendToEmailFunc sendToEmailFunc;
 
 BreachType inferBreach(double value, double lowerLimit, double upperLimit);
 BreachType classifyTemperatureBreach(CoolingType coolingType, double temperatureInC);
