@@ -2,6 +2,7 @@
 #include <gmock/gmock.h>
 #include "typewise-alert.h"
 #include "alert-functions.h"
+#include <functional> // Include this for std::function
 
 class MockAlertFunctions {
 public:
