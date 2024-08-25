@@ -71,3 +71,9 @@ void sendToEmail(BreachType breachType)
     printf("Hi, the temperature is too high\n");
   }
 }
+
+void sendToController(BreachType breachType)
+{
+  const unsigned short header = 0xfeed;
+  printf("%x : %x\n", header, breachType);
+}
