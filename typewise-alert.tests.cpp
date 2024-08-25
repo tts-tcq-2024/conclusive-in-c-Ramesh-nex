@@ -1,6 +1,25 @@
 #include <gtest/gtest.h>
 #include "typewise-alert.h"
-#include "alert-functions.h" 
+#include <gmock/gmock.h>
+
+using ::testing::InSequence;
+using ::testing::StrictMock;
+
+class MockAlert : public Alert {
+public:
+    MOCK_METHOD(void, sendToController, (BreachType breachType), (override));
+    MOCK_METHOD(void, sendToEmail, (BreachType breachType), (override));
+};
+
+MockAlert mockAlert;
+
+void sendToController(BreachType breachType) {
+    mockAlert.sendToController(breachType);
+}
+
+void sendToEmail(BreachType breachType) {
+    mockAlert.sendToEmail(breachType);
+}
 
 // Test Case for inferBreach
 TEST(TemperatureTest, InferBreach)
@@ -46,3 +65,20 @@ TEST(TemperatureTest, ClassifyTemperatureBreach)
     EXPECT_EQ(classifyTemperatureBreach(MED_ACTIVE_COOLING, 45.0), TOO_HIGH);
 }
 
+// Test Case for checkAndAlert
+TEST_F(AlertTest, CheckAndAlert)
+{
+    {
+        InSequence seq;
+
+        EXPECT_CALL(mockAlert, sendToController(TOO_LOW))
+            .Times(1);
+        EXPECT_CALL(mockAlert, sendToEmail(TOO_HIGH))
+            .Times(1);
+
+        BatteryCharacter batteryChar;
+        batteryChar.coolingType = PASSIVE_COOLING;
+        checkAndAlert(TO_CONTROLLER, batteryChar, -5.0); // Triggers sendToController
+        checkAndAlert(TO_EMAIL, batteryChar, 40.0); // Triggers sendToEmail
+    }
+}
