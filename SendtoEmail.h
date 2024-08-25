@@ -1,1 +1,2 @@
 
+void sendToEmail(BreachType breachType);
