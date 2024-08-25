@@ -3,6 +3,8 @@
 #include "typewise-alert.h"
 #include "alert-functions.h"
 
+testing::Mock::AllowLeak(mockFunctions);
+
 // Mocking the functions
 class MockAlertFunctions {
 public:
