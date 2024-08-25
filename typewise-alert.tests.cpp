@@ -3,16 +3,12 @@
 #include "typewise-alert.h"
 #include "alert-functions.h"
 
-testing::Mock::AllowLeak(mockFunctions);
-
-// Mocking the functions
+// Mock class
 class MockAlertFunctions {
 public:
     MOCK_METHOD(void, sendToController, (BreachType), ());
     MOCK_METHOD(void, sendToEmail, (BreachType), ());
 };
-
-MockAlertFunctions mockFunctions;
 
 // Test Case for inferBreach
 TEST(TemperatureTest, InferBreach) {
@@ -57,16 +53,18 @@ TEST(TemperatureTest, ClassifyTemperatureBreach) {
 
 // Test Case for checkAndAlert with Mock
 TEST(TemperatureTest, CheckAndAlert) {
+    MockAlertFunctions mockFunctions;
+
     // Define the mock function behavior
     EXPECT_CALL(mockFunctions, sendToController(TOO_LOW)).Times(1);
     EXPECT_CALL(mockFunctions, sendToEmail(TOO_HIGH)).Times(1);
 
-    // Pass mock functions as parameters
+    // Call the function with mock functions
     checkAndAlert(TO_CONTROLLER, {PASSIVE_COOLING}, -10.0, 
-                  [](BreachType bt){ mockFunctions.sendToController(bt); }, 
-                  [](BreachType bt){ mockFunctions.sendToEmail(bt); });
+                  [&mockFunctions](BreachType bt){ mockFunctions.sendToController(bt); }, 
+                  [&mockFunctions](BreachType bt){ mockFunctions.sendToEmail(bt); });
 
     checkAndAlert(TO_EMAIL, {HI_ACTIVE_COOLING}, 50.0, 
-                  [](BreachType bt){ mockFunctions.sendToController(bt); }, 
-                  [](BreachType bt){ mockFunctions.sendToEmail(bt); });
+                  [&mockFunctions](BreachType bt){ mockFunctions.sendToController(bt); }, 
+                  [&mockFunctions](BreachType bt){ mockFunctions.sendToEmail(bt); });
 }
