@@ -64,7 +64,8 @@ TEST(TemperatureTest, ClassifyTemperatureBreach) {
 // Test Case for checkAndAlert
 TEST(TemperatureTest, CheckAndAlert) {
     {
-        InSequence seq;
+        // Ensure that the calls are made in a specific sequence
+        ::testing::InSequence seq;
 
         // Expectations for mock functions
         EXPECT_CALL(mockAlert, sendToController(TOO_LOW))
@@ -74,7 +75,11 @@ TEST(TemperatureTest, CheckAndAlert) {
 
         BatteryCharacter batteryChar;
         batteryChar.coolingType = PASSIVE_COOLING;
+
+        // Testing sendToController call
         checkAndAlert(TO_CONTROLLER, batteryChar, -5.0); // Triggers sendToController
+
+        // Testing sendToEmail call
         checkAndAlert(TO_EMAIL, batteryChar, 40.0); // Triggers sendToEmail
     }
 }
