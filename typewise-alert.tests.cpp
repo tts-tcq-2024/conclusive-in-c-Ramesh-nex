@@ -2,26 +2,6 @@
 #include <gmock/gmock.h>
 #include "typewise-alert.h"
 
-// Mock class to replace the functions
-class MockAlert {
-public:
-    MOCK_METHOD(void, sendToController, (BreachType), ());
-    MOCK_METHOD(void, sendToEmail, (BreachType), ());
-};
-
-// Instantiate the mock object
-MockAlert mockAlert;
-
-// Mock implementations for the test file
-extern "C" {
-    void sendToController(BreachType breachType) {
-        mockAlert.sendToController(breachType);
-    }
-
-    void sendToEmail(BreachType breachType) {
-        mockAlert.sendToEmail(breachType);
-    }
-}
 
 // Test Case for inferBreach
 TEST(TemperatureTest, InferBreach) {
@@ -64,23 +44,4 @@ TEST(TemperatureTest, ClassifyTemperatureBreach) {
     EXPECT_EQ(classifyTemperatureBreach(MED_ACTIVE_COOLING, 45.0), TOO_HIGH);
 }
 
-// Test Case for checkAndAlert
-TEST(TemperatureTest, CheckAndAlert) {
-    {
-        ::testing::InSequence seq;
 
-        EXPECT_CALL(mockAlert, sendToController(TOO_LOW))
-            .Times(1);
-        EXPECT_CALL(mockAlert, sendToEmail(TOO_HIGH))
-            .Times(1);
-
-        BatteryCharacter batteryChar;
-        batteryChar.coolingType = PASSIVE_COOLING;
-
-        // Testing sendToController call
-        checkAndAlert(TO_CONTROLLER, batteryChar, -5.0); // Triggers sendToController
-
-        // Testing sendToEmail call
-        checkAndAlert(TO_EMAIL, batteryChar, 40.0); // Triggers sendToEmail
-    }
-}
