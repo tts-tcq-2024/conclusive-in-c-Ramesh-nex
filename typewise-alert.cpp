@@ -44,7 +44,8 @@ BreachType classifyTemperatureBreach(CoolingType coolingType, double temperature
 }
 
 void checkAndAlert(AlertTarget alertTarget, BatteryCharacter batteryChar, double temperatureInC,
-                    void (*sendController)(BreachType), void (*sendEmail)(BreachType))
+                    std::function<void(BreachType)> sendController,
+                    std::function<void(BreachType)> sendEmail)
 {
     BreachType breachType = classifyTemperatureBreach(batteryChar.coolingType, temperatureInC);
     if (alertTarget == TO_CONTROLLER)
