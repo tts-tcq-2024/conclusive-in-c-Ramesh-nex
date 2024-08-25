@@ -10,6 +10,8 @@ public:
     MOCK_METHOD(void, sendToEmail, (BreachType), ());
 };
 
+MockAlertFunctions mockFunctions;
+
 // Test Case for inferBreach
 TEST(TemperatureTest, InferBreach) {
     EXPECT_EQ(inferBreach(20.0, 0.0, 35.0), NORMAL);
@@ -53,9 +55,6 @@ TEST(TemperatureTest, ClassifyTemperatureBreach) {
 
 // Test Case for checkAndAlert with Mock
 TEST(TemperatureTest, CheckAndAlert) {
-    // Create the mock object inside the test function
-    MockAlertFunctions mockFunctions;
-
     // Define the mock function behavior
     EXPECT_CALL(mockFunctions, sendToController(TOO_LOW)).Times(1);
     EXPECT_CALL(mockFunctions, sendToEmail(TOO_HIGH)).Times(1);
