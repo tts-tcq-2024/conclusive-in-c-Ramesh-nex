@@ -3,7 +3,6 @@
 #include "typewise-alert.h"
 #include "alert-functions.h"
 
-// Mock class
 class MockAlertFunctions {
 public:
     MOCK_METHOD(void, sendToController, (BreachType), ());
@@ -60,11 +59,11 @@ TEST(TemperatureTest, CheckAndAlert) {
     EXPECT_CALL(mockFunctions, sendToEmail(TOO_HIGH)).Times(1);
 
     // Call the function with mock functions
-    checkAndAlert(TO_CONTROLLER, {PASSIVE_COOLING}, -10.0, 
-                  [&mockFunctions](BreachType bt){ mockFunctions.sendToController(bt); }, 
+    checkAndAlert(TO_CONTROLLER, {PASSIVE_COOLING}, -10.0,
+                  [&mockFunctions](BreachType bt){ mockFunctions.sendToController(bt); },
                   [&mockFunctions](BreachType bt){ mockFunctions.sendToEmail(bt); });
 
-    checkAndAlert(TO_EMAIL, {HI_ACTIVE_COOLING}, 50.0, 
-                  [&mockFunctions](BreachType bt){ mockFunctions.sendToController(bt); }, 
+    checkAndAlert(TO_EMAIL, {HI_ACTIVE_COOLING}, 50.0,
+                  [&mockFunctions](BreachType bt){ mockFunctions.sendToController(bt); },
                   [&mockFunctions](BreachType bt){ mockFunctions.sendToEmail(bt); });
 }
